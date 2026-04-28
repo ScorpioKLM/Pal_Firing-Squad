@@ -1,151 +1,207 @@
-<!doctype html>
+<!DOCTYPE html>
+
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Pal Firing Squad</title>
+
 <style>
-body { margin:0; font-family: Arial, sans-serif; background:#f4f0ff; color:#1f2937; }
-main { max-width:1000px; margin:0 auto; padding:24px; }
-.card { background:white; border-radius:20px; padding:24px; margin:18px 0; box-shadow:0 14px 40px rgba(0,0,0,.10); }
-h1 { font-size:42px; margin:0 0 10px; color:#5b21b6; }
-button { background:#5b21b6; color:white; border:0; border-radius:12px; padding:12px 16px; font-weight:700; cursor:pointer; margin:8px 8px 8px 0; }
-button.secondary { background:#111827; }
-input, textarea { width:100%; padding:12px; border:1px solid #ddd; border-radius:10px; font:inherit; box-sizing:border-box; }
-textarea { min-height:85px; }
-label { display:block; margin:18px 0; font-weight:700; }
-.notice { background:#fff7d6; padding:14px; border-radius:12px; line-height:1.5; }
-.question { border-top:1px solid #eee; padding-top:12px; }
-.score { font-size:72px; font-weight:900; color:#5b21b6; }
-.result { background:#f8fafc; border-radius:14px; padding:14px; margin:12px 0; }
-.two { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
-@media(max-width:700px) { .two { grid-template-columns:1fr; } h1 { font-size:32px; } }
+body {
+  margin:0;
+  font-family: 'Segoe UI', sans-serif;
+  background: linear-gradient(135deg,#6d28d9,#1e1b4b);
+  color:white;
+}
+
+.container {
+  max-width:900px;
+  margin:auto;
+  padding:30px 20px;
+}
+
+.card {
+  background:white;
+  color:#111;
+  border-radius:20px;
+  padding:25px;
+  margin:20px 0;
+  box-shadow:0 20px 50px rgba(0,0,0,.3);
+}
+
+h1 {
+  font-size:40px;
+  margin-bottom:10px;
+}
+
+.subtitle {
+  opacity:.8;
+  margin-bottom:20px;
+}
+
+textarea {
+  width:100%;
+  min-height:80px;
+  border-radius:10px;
+  border:1px solid #ddd;
+  padding:10px;
+}
+
+button {
+  background:#6d28d9;
+  color:white;
+  border:none;
+  padding:12px 18px;
+  border-radius:10px;
+  cursor:pointer;
+  margin-top:15px;
+  font-weight:bold;
+}
+
+button.secondary {
+  background:#111;
+}
+
+.question {
+  margin-top:15px;
+}
+
+.score {
+  font-size:70px;
+  font-weight:bold;
+  color:#6d28d9;
+}
+
+.result {
+  background:#f1f5f9;
+  padding:15px;
+  border-radius:10px;
+  margin-top:10px;
+}
+
 </style>
+
 </head>
+
 <body>
-<main>
-<div class="card">
+
+<div class="container">
+
 <h1>Pal Firing Squad</h1>
-<p>Friend answers first. Then you answer. Then the app compares compatibility.</p>
-<button onclick="showFriend()">Friend Questionnaire</button>
-<button class="secondary" onclick="showOwner()">Owner Dashboard</button>
+<div class="subtitle">Brutally honest compatibility breakdown</div>
+
+<div class="card">
+<button onclick="setupOwner()">Set Your Answers (One-Time Setup)</button>
+<button class="secondary" onclick="startFriend()">Start Compatibility Test</button>
 </div>
 
 <div id="app"></div>
-</main>
+
+</div>
 
 <script>
-const QUESTIONS = ["What are your hobbies and interests?", "Are you clean or messy?", "Are you punctual or fashionably late?", "List 3 physical items you like.", "How do you like your coffee?", "How do you like to spend your free time?", "What are your favorite books/authors?", "What are your favorite movies/genres?", "Do you have any favorite TV shows or series?", "What kind of music do you enjoy listening to?", "What places can you realistically and plan to visit within the next year?", "What's your favorite way to relax or unwind?", "What are some of your long-term goals or dreams?", "Describe your ideal friendship.", "What are your pet peeves or things you dislike?", "What's your favorite season and why?", "Do you have any favorite quotes or mottos that inspire you?", "What's your idea of a perfect day?", "What's something you've always wanted to learn or try?", "What's your biggest fear or phobia?", "What do you admire most about yourself?", "What's something you wish you were better at?", "What's your favorite childhood memory?", "Is there anything you wish I knew about you or understood better?", "What topics are off limits between us?", "What qualities about me do you like?", "What qualities about me do you dislike?", "What do you think I should improve on?", "What is your favorite color?", "What political party do your ideologies align with?", "Are you more creative or analytical?", "Do you prefer routine or spontaneity?", "What is your favorite animal and why?", "Are you passionate enough about animals to join PETA?", "Do you agree it is cruel and inhumane for orcas to be held in captivity in the SeaWorld franchise?", "Would you be interested in helping me prepare a bill in Congress that would make it illegal to own orcas for any purpose and declare orcas as a protected class of non-human persons with rights and protections?", "What law(s) do you absolutely disagree with?", "When you tell me something negative, would you prefer me to not ask questions and just listen, or become involved in a solution?", "Do you think marijuana should be legal?", "If you could live in any era of history, which one would you choose and why?", "What's the most unusual or adventurous thing you've ever done?", "What\u2019s your favorite food type or meal?", "Who is your favorite celebrity of all time and why?", "What's a hobby or interest you've always wanted to pursue but never got around to?", "What\u2019s a hobby or interest you would specifically like to do with me?", "Do you like Virtual Reality?", "Would you be interested in remotely watching movies together?", "What's the most memorable dream you've ever had?", "How do you feel about Religion?", "Do you believe in a God?", "Do you believe in Jesus?", "What is your biggest talent?", "What's the most spontaneous thing you've ever done?", "Have you ever cheated on one or more people? If so, how many?", "Would you ever cheat on someone?", "Is it ever morally justifiable to break the law? If so, in what scenario?", "Should euthanasia be legalized for terminally ill patients who are suffering?", "Is it ethical to use animals for scientific experiments or testing?", "Are you pro-choice or do you think abortion should be illegal?", "Should parents have the right to genetically modify their children before birth?", "Is it morally acceptable to prioritize the lives of humans over animals in all circumstances?", "Is it ethical to consume products that are known to be produced through child labor?", "Should individuals have the right to end their own life through certified euthanasia programs, if they are suffering from severe mental illness?", "Is it ever justifiable to lie to protect someone's feelings or prevent harm?", "Should the death penalty be abolished?", "Is it ethical to use artificial intelligence in decision-making processes that affect human lives?", "Is it ethical to redistribute wealth to address socioeconomic inequality or should successful wealthy people not be penalized for their success?", "Is it ethical to use technology to enhance human capabilities?", "Is it morally permissible to clone humans?", "You find a wallet containing money and ID. Do you keep the money, return it intact, or report it?", "You witness a friend cheating on a significant other. What do you do?", "You're in a lifeboat with limited supplies and too many people. What do you do?", "You're a doctor with only enough medication to save one patient out of two. How do you decide?", "You're offered a higher salary job involving morally questionable practices. What do you do?", "You discover a colleague is being unfairly treated or discriminated against. What do you do?", "You witness injustice but fear retaliation. What do you do?", "You're aware of a company's unethical environmental practices. What do you do?", "You're asked to testify in court but doing so could endanger safety. What do you do?", "You're offered advancement by taking credit for someone else's work. What do you do?", "You witness a friend driving under the influence. What do you do?", "You have power to enact positive change at personal cost. What do you do?", "You accidentally damage someone's property and nobody saw. What do you do?", "You're asked to keep a secret that could harm someone. What do you do?", "Do you conform to expectations or stay true to yourself when beliefs conflict with society?", "Have you been diagnosed with any health conditions? If yes, please explain.", "Have you been diagnosed with any mental health conditions? If yes, please explain.", "Would you consider yourself a good, safe, and defensive driver?", "How many traffic violations have you received since driving age?", "How many accidents by fault or no fault have you been in?", "Is there a serious topic that you think you and I need to discuss?", "If we have conflict, would you be willing to resolve it through a one-hour remote therapy session with me?", "Do you want to have children? If so, how many, what genders, and what timeframe?", "Is there anything you would like to know about me and have not asked?", "Is there anything I have not asked or do not know about you that you would like to share?"];
 
-function showFriend() {
-  document.getElementById('app').innerHTML = `
+const QUESTIONS = [
+"What are your hobbies and interests?",
+"Are you clean or messy?",
+"What are your long-term goals?",
+"What are your pet peeves?",
+"What do you value most in a friendship?",
+"What are your beliefs about honesty?",
+"Do you believe in God?",
+"Do you want children?",
+"What would you do if you found a wallet full of money?",
+"What is your ideal way to spend free time?"
+];
+
+// ---------- OWNER SETUP ----------
+function setupOwner(){
+  document.getElementById("app").innerHTML = `
   <div class="card">
-    <h2>Friend Questionnaire</h2>
-    <label>Name<input id="friendName" placeholder="Enter name"></label>
-    <div class="notice">This questionnaire includes personal, values-based, political, religious, health, and mental health questions. Answer only what you are comfortable sharing. You may type “prefer not to answer” anywhere.</div>
-    <div id="friendQuestions"></div>
-    <button onclick="submitFriend()">Submit Answers</button>
-  </div>`;
-  renderQuestions('friendQuestions','f');
-}
-
-function renderQuestions(containerId, prefix) {
-  const box = document.getElementById(containerId);
-  box.innerHTML = QUESTIONS.map((q,i)=>`
-    <label class="question">${i+1}. ${q}
-      <textarea id="${prefix}${i}" placeholder="Type answer here..."></textarea>
-    </label>`).join('');
-}
-
-function submitFriend() {
-  const name = document.getElementById('friendName').value.trim() || 'Unnamed Friend';
-  const answers = QUESTIONS.map((_,i)=>document.getElementById('f'+i).value);
-  const submissions = JSON.parse(localStorage.getItem('pfs_submissions') || '[]');
-  submissions.unshift({ id: Date.now(), name, answers, createdAt: new Date().toLocaleString() });
-  localStorage.setItem('pfs_submissions', JSON.stringify(submissions));
-  alert('Submitted. Now the owner can open the dashboard and answer their side.');
-  location.href = 'mailto:YOUR_EMAIL_HERE?subject=New Pal Firing Squad Submission&body=' + encodeURIComponent(name + ' completed the questionnaire.');
-}
-
-function showOwner() {
-  const submissions = JSON.parse(localStorage.getItem('pfs_submissions') || '[]');
-  document.getElementById('app').innerHTML = `
-  <div class="card">
-    <h2>Owner Dashboard</h2>
-    ${submissions.length ? submissions.map((s,i)=>`<button onclick="answerOwner(${i})">${s.name} - ${s.createdAt}</button>`).join('') : '<p>No submissions yet on this device.</p>'}
-  </div>`;
-}
-
-function answerOwner(index) {
-  const submissions = JSON.parse(localStorage.getItem('pfs_submissions') || '[]');
-  const s = submissions[index];
-  window.currentSubmission = s;
-  document.getElementById('app').innerHTML = `
-  <div class="card">
-    <h2>Your Answers Compared With ${s.name}</h2>
+    <h2>Your Profile (saved once)</h2>
     <div id="ownerQuestions"></div>
-    <button onclick="generateReport()">Generate Compatibility Report</button>
+    <button onclick="saveOwner()">Save My Answers</button>
   </div>`;
-  renderQuestions('ownerQuestions','y');
+  
+  render("ownerQuestions","o");
 }
 
-function normalize(t) { return (t||'').toLowerCase().replace(/[^a-z0-9\s]/g,' ').split(/\s+/).filter(Boolean); }
-
-function scorePair(a,b) {
-  const A = new Set(normalize(a));
-  const B = new Set(normalize(b));
-  if (!A.size || !B.size) return 40;
-  let matches = 0;
-  A.forEach(w=>{ if(B.has(w)) matches++; });
-  return Math.min(100, Math.round(45 + (matches / Math.max(A.size, B.size)) * 55));
+function saveOwner(){
+  const answers = QUESTIONS.map((_,i)=>document.getElementById("o"+i).value);
+  localStorage.setItem("owner", JSON.stringify(answers));
+  alert("Saved. You never have to do this again.");
 }
 
-function category(q) {
-  q = q.toLowerCase();
-  if(q.includes('god')||q.includes('jesus')||q.includes('religion')) return 'Spiritual compatibility';
-  if(q.includes('law')||q.includes('ethical')||q.includes('moral')||q.includes('justice')||q.includes('death penalty')) return 'Ethics and values';
-  if(q.includes('children')||q.includes('family')) return 'Family and future';
-  if(q.includes('clean')||q.includes('coffee')||q.includes('free time')||q.includes('food')||q.includes('music')) return 'Lifestyle';
-  if(q.includes('friend')||q.includes('conflict')||q.includes('therapy')||q.includes('secret')) return 'Friendship and conflict';
-  return 'Personality and interests';
-}
-
-function generateReport() {
-  const s = window.currentSubmission;
-  const yours = QUESTIONS.map((_,i)=>document.getElementById('y'+i).value);
-  let grouped = {};
-  QUESTIONS.forEach((q,i)=>{
-    const c = category(q);
-    if(!grouped[c]) grouped[c] = [];
-    grouped[c].push({ q, score: scorePair(s.answers[i], yours[i]), f: s.answers[i], y: yours[i] });
-  });
-  const cats = Object.entries(grouped).map(([name, items])=>({
-    name,
-    avg: Math.round(items.reduce((a,b)=>a+b.score,0)/items.length),
-    items
-  }));
-  const overall = Math.round(cats.reduce((a,b)=>a+b.avg,0)/cats.length);
-  const verdict = overall >= 80 ? 'Strong compatibility' : overall >= 60 ? 'Promising compatibility with areas to discuss' : 'Mixed compatibility that needs clear communication';
-  document.getElementById('app').innerHTML = `
+// ---------- FRIEND FLOW ----------
+function startFriend(){
+  document.getElementById("app").innerHTML = `
   <div class="card">
-    <h2>Compatibility Report for ${s.name}</h2>
-    <div class="score">${overall}%</div>
-    <h3>${verdict}</h3>
-    ${cats.map(c=>`
-      <div class="result">
-        <h3>${c.name}: ${c.avg}%</h3>
-        ${c.items.sort((a,b)=>a.score-b.score).slice(0,4).map(item=>`
-          <div class="result">
-            <strong>${item.q}</strong><br>
-            <small>Signal: ${item.score}%</small>
-            <div class="two">
-              <p><b>Friend:</b><br>${item.f || 'No answer'}</p>
-              <p><b>You:</b><br>${item.y || 'No answer'}</p>
-            </div>
-          </div>`).join('')}
-      </div>`).join('')}
+    <h2>Answer Honestly</h2>
+    <div id="friendQuestions"></div>
+    <button onclick="submitFriend()">Get Results</button>
+  </div>`;
+  
+  render("friendQuestions","f");
+}
+
+// ---------- RENDER ----------
+function render(id,prefix){
+  const box = document.getElementById(id);
+  box.innerHTML = QUESTIONS.map((q,i)=>`
+    <div class="question">
+      <b>${i+1}. ${q}</b>
+      <textarea id="${prefix}${i}"></textarea>
+
+```
+</div>`).join("");
+```
+
+}
+
+// ---------- SCORING ----------
+function submitFriend(){
+const owner = JSON.parse(localStorage.getItem("owner"));
+
+if(!owner){
+alert("Owner has not set answers yet.");
+return;
+}
+
+const friend = QUESTIONS.map((_,i)=>document.getElementById("f"+i).value);
+
+let score = 0;
+
+friend.forEach((f,i)=>{
+if(!f || !owner[i]) return;
+
+```
+const fWords = f.toLowerCase().split(" ");
+const oWords = owner[i].toLowerCase().split(" ");
+
+const matches = fWords.filter(w=>oWords.includes(w)).length;
+
+score += matches;
+```
+
+});
+
+let percent = Math.min(100, score);
+
+let verdict =
+percent > 75 ? "🔥 Strong Alignment" :
+percent > 55 ? "👍 Decent Compatibility" :
+"⚠️ Major Differences";
+
+document.getElementById("app").innerHTML = `
+
+  <div class="card">
+    <h2>Compatibility Result</h2>
+    <div class="score">${percent}%</div>
+    <div class="result">${verdict}</div>
   </div>`;
 }
+
 </script>
+
 </body>
 </html>
